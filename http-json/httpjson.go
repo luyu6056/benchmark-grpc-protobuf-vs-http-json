@@ -11,7 +11,7 @@ import (
 // Start entrypoint
 func Start() {
 	http.HandleFunc("/", CreateUser)
-	log.Println(http.ListenAndServe(":60001", nil))
+	log.Println(http.ListenAndServeTLS(":60001", "./EccSite.pem", "./EccSite.key", nil))
 }
 
 // User type

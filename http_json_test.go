@@ -2,6 +2,7 @@ package benchmarks
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"net/http"
 	"testing"
@@ -15,9 +16,12 @@ func init() {
 	time.Sleep(time.Second)
 }
 
-func BenchmarkHTTPJSON(b *testing.B) {
-	client := &http.Client{}
-
+func BenchmarkHTTPSJSON(b *testing.B) {
+	client := &http.Client{Transport: &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}}
 	for n := 0; n < b.N; n++ {
 		doPost(client, b)
 	}
@@ -32,7 +36,7 @@ func doPost(client *http.Client, b *testing.B) {
 	buf := new(bytes.Buffer)
 	json.NewEncoder(buf).Encode(u)
 
-	resp, err := client.Post("http://127.0.0.1:60001/", "application/json", buf)
+	resp, err := client.Post("https://127.0.0.1:60001/", "application/json", buf)
 	if err != nil {
 		b.Fatalf("http request failed: %v", err)
 	}
